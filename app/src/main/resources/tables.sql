@@ -21,5 +21,6 @@ create table IF NOT EXISTS USERSADDRESSES (
     isprimary BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES USERS(id),
     FOREIGN KEY (address_id) REFERENCES ADDRESSES(id),
-    UNIQUE(address_id)
+    UNIQUE(address_id),
+    PRIMARY KEY(user_id, address_id)
 );

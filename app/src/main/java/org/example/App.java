@@ -71,7 +71,8 @@ public class App {
                     "    isprimary BOOLEAN,\r\n" + //
                     "    FOREIGN KEY (user_id) REFERENCES USERS(id),\r\n" + //
                     "    FOREIGN KEY (address_id) REFERENCES ADDRESSES(id),\r\n" + //
-                    "    UNIQUE(address_id)\r\n" + //
+                    "    UNIQUE(address_id),\r\n" + //
+                    "    PRIMARY KEY(user_id, address_id)\r\n" + //
                     ");").close();
             System.out.println("Generated tables");
         } catch (SQLException e) {
@@ -152,40 +153,42 @@ public class App {
             if (!rs.isBeforeFirst()) {
                 int count = 1;
                 int end = 100;
+                HashMap<Integer, Integer> usermap = new HashMap<>();
+                HashMap<Integer, Integer> addressmap = new HashMap<>();
+                java.util.List<Integer> addressIds = new java.util.ArrayList<>();
+                for (int k = 0; k < end; k++) {
+                    Random random = new Random();
+                    int range = end - 1 + 1;
+                    int address_id = random.nextInt(range) + 1;
+                    if (addressmap.getOrDefault(address_id, 0).equals(0)) {
+                        addressmap.put(address_id, 1);
+                        addressIds.add(address_id);
+                    }
+                }
                 String stmtString = "INSERT INTO USERSADDRESSES (address_id, user_id, isprimary) VALUES ";
-                for (int i = 0; i < end; i++) {
+                for (int i = 0; i < addressIds.size(); i++) {
                     stmtString += "(?,?,?)";
-                    if (i == end - 1) {
+                    if (i == addressIds.size() - 1) {
                         stmtString += ";";
                     } else {
                         stmtString += ",";
                     }
                 }
-                HashMap<Integer, Integer> usermap = new HashMap<>();
-                HashMap<Integer, Integer> addressmap = new HashMap<>();
                 PreparedStatement stmt = db.prepareStatement(stmtString);
-                for (int j = 0; j < end; j++) {
+                for (int j = 0; j < addressIds.size(); j++) {
                     Random random = new Random();
                     int range = end - 1 + 1;
-                    int address_id = random.nextInt(range) + 1;
                     int user_id = random.nextInt(range) + 1;
-                    if (addressmap.getOrDefault(address_id, 0).equals(0)) {
-                        addressmap.put(address_id, 1);
-                        if (usermap.getOrDefault(user_id, 0).equals(0)) {
-                            usermap.put(user_id, 1);
-                            stmt.setInt(count, address_id);
-                            stmt.setInt(count + 1, user_id);
-                            stmt.setBoolean(count + 2, true);
-                        } else {
-                            usermap.put(user_id, usermap.get(user_id) + 1);
-                            stmt.setInt(count, address_id);
-                            stmt.setInt(count + 1, user_id);
-                            stmt.setBoolean(count + 2, false);
-                        }
+                    if (usermap.getOrDefault(user_id, 0).equals(0)) {
+                        usermap.put(user_id, 1);
+                        stmt.setInt(count, addressIds.get(j));
+                        stmt.setInt(count + 1, user_id);
+                        stmt.setBoolean(count + 2, true);
                     } else {
-                        stmt.setNull(count, 0);
-                        stmt.setNull(count + 1, 0);
-                        stmt.setNull(count + 2, 0);
+                        usermap.put(user_id, usermap.get(user_id) + 1);
+                        stmt.setInt(count, addressIds.get(j));
+                        stmt.setInt(count + 1, user_id);
+                        stmt.setBoolean(count + 2, false);
                     }
                     count += 3;
                 }
