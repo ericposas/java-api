@@ -15,6 +15,24 @@ public class UserRepo {
 
     private Connection db = DB.getDbConnection();
 
+    public boolean createUser(User user) {
+        try {
+            db = DB.connect();
+            if (user.getFirstName() != null && user.getLastName() != null) {
+                PreparedStatement stmt = db.prepareStatement("INSERT INTO USERS (firstname, lastname) VALUES (?,?);");
+                stmt.setString(1, user.getFirstName());
+                stmt.setString(2, user.getLastName());
+                stmt.executeUpdate();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public User findOne(int id) {
         User user = new User();
         try {

@@ -1,5 +1,8 @@
 package org.example.objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     private int id;
     private String firstname;

@@ -24,6 +24,10 @@ public class UsersService {
         return UsersServiceHolder.HOLDER_INSTANCE;
     }
 
+    public boolean createUser(User user) {
+        return userRepo.createUser(user);
+    }
+
     public String getUsers() {
         List<User> users = userRepo.find();
         String usersToString = "";

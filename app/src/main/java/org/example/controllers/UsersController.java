@@ -4,9 +4,14 @@ import static io.undertow.util.Headers.CONTENT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.example.exceptions.NotFoundException;
+import org.example.objects.User;
 import org.example.services.UsersService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.undertow.Handlers;
+import io.undertow.io.Receiver.FullStringCallback;
 import io.undertow.predicate.Predicate;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
@@ -24,8 +29,8 @@ public class UsersController {
         UsersController controller = new UsersController();
         return Handlers.routing()
                 .get("/users", noQueryParameters, controller.getUsers())
-                .get("/users/{id}", containsId, controller.getUser());
-        // .post("/users", controller.createUser())
+                .get("/users/{id}", containsId, controller.getUser())
+                .post("/users", controller.createUser());
         // .delete("/users/{id}", containsId, controller.deleteUser());
     }
 
@@ -54,6 +59,23 @@ public class UsersController {
             exchange.getResponseHeaders().put(CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(user, UTF_8);
         };
+    }
+
+    private HttpHandler createUser() {
+        FullStringCallback callback = (exchange, payload) -> {
+            ObjectMapper om = new ObjectMapper();
+            try {
+                User user = om.readValue(payload, User.class);
+                boolean created = service.createUser(user);
+                exchange.setStatusCode(io.undertow.util.StatusCodes.CREATED);
+                exchange.getResponseHeaders().put(CONTENT_TYPE, "application/json");
+                exchange.getResponseSender().send(created ? "Created new user" : "Could not create new user", UTF_8);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                exchange.getResponseSender().send("Could not create new user", UTF_8);
+            }
+        };
+        return (exchange) -> exchange.getRequestReceiver().receiveFullString(callback, UTF_8);
     }
 
 }
