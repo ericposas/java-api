@@ -48,32 +48,40 @@ public class App {
         try {
             db = DB.connect();
             java.sql.Statement create = db.createStatement();
-            create.executeQuery("create table IF NOT EXISTS USERS (\r\n" + //
+            create.executeQuery("CREATE TABLE IF NOT EXISTS USERS (\r\n" + //
                     "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    firstname varchar(255),\r\n" + //
-                    "    lastname varchar(255)\r\n" + //
+                    "    firstname VARCHAR(255),\r\n" + //
+                    "    lastname VARCHAR(255)\r\n" + //
                     ");\r\n" + //
                     "\r\n" + //
-                    "create table IF NOT EXISTS ADDRESSES (\r\n" + //
+                    "CREATE TABLE IF NOT EXISTS ADDRESSES (\r\n" + //
                     "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    line1 varchar(255),\r\n" + //
-                    "    line2 varchar(255),\r\n" + //
-                    "    city varchar(255),\r\n" + //
-                    "    postalcode varchar(255),\r\n" + //
-                    "    stateprovince varchar(255),\r\n" + //
-                    "    countryid varchar(255),\r\n" + //
+                    "    line1 VARCHAR(255),\r\n" + //
+                    "    line2 VARCHAR(255),\r\n" + //
+                    "    city VARCHAR(255),\r\n" + //
+                    "    postalcode VARCHAR(255),\r\n" + //
+                    "    stateprovince VARCHAR(255),\r\n" + //
+                    "    countryid VARCHAR(255),\r\n" + //
                     "    UNIQUE(line1)\r\n" + //
                     ");\r\n" + //
                     "\r\n" + //
-                    "create table IF NOT EXISTS USERSADDRESSES (\r\n" + //
-                    "    user_id int,\r\n" + //
-                    "    address_id int,\r\n" + //
+                    "CREATE TABLE IF NOT EXISTS USERSADDRESSES (\r\n" + //
+                    "    user_id INT,\r\n" + //
+                    "    address_id INT,\r\n" + //
                     "    isprimary BOOLEAN,\r\n" + //
-                    "    FOREIGN KEY (user_id) REFERENCES USERS(id),\r\n" + //
-                    "    FOREIGN KEY (address_id) REFERENCES ADDRESSES(id),\r\n" + //
+                    "    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,\r\n" + //
+                    "    FOREIGN KEY (address_id) REFERENCES ADDRESSES(id) ON DELETE CASCADE,\r\n" + //
                     "    UNIQUE(address_id),\r\n" + //
                     "    PRIMARY KEY(user_id, address_id)\r\n" + //
-                    ");").close();
+                    ");\r\n" + //
+                    "\r\n" + //
+                    "CREATE INDEX IF NOT EXISTS firstname_search ON USERS(firstname);\r\n" + //
+                    "\r\n" + //
+                    "CREATE INDEX IF NOT EXISTS lastname_search ON USERS(lastname);\r\n" + //
+                    "\r\n" + //
+                    "CREATE INDEX IF NOT EXISTS lowercase_firstname_search ON USERS(lower(firstname));\r\n" + //
+                    "\r\n" + //
+                    "CREATE INDEX IF NOT EXISTS lowercase_lastname_search ON USERS(lower(lastname));").close();
             System.out.println("Generated tables");
         } catch (SQLException e) {
             e.printStackTrace();
