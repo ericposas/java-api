@@ -18,10 +18,10 @@ public class UserRepo {
     public boolean createUser(User user) {
         try {
             db = DB.connect();
-            if (user.getFirstName() != null && user.getLastName() != null) {
+            if (user.getFirstname() != null && user.getLastname() != null) {
                 PreparedStatement stmt = db.prepareStatement("INSERT INTO USERS (firstname, lastname) VALUES (?,?);");
-                stmt.setString(1, user.getFirstName());
-                stmt.setString(2, user.getLastName());
+                stmt.setString(1, user.getFirstname());
+                stmt.setString(2, user.getLastname());
                 stmt.executeUpdate();
                 return true;
             } else {
@@ -43,8 +43,8 @@ public class UserRepo {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 user.setId(rs.getInt("id"));
-                user.setFirstName(rs.getString("firstname"));
-                user.setLastName(rs.getString("lastname"));
+                user.setFirstname(rs.getString("firstname"));
+                user.setLastname(rs.getString("lastname"));
             }
             db.close();
             return user;
@@ -63,8 +63,8 @@ public class UserRepo {
             while (result.next()) {
                 User user = new User();
                 user.setId(result.getInt("id"));
-                user.setFirstName(result.getString("firstname"));
-                user.setLastName(result.getString("lastname"));
+                user.setFirstname(result.getString("firstname"));
+                user.setLastname(result.getString("lastname"));
                 users.add(user);
             }
             db.close();

@@ -16,19 +16,19 @@ public class User {
         return id;
     }
 
-    public void setFirstName(String name) {
+    public void setFirstname(String name) {
         this.firstname = name;
     }
 
-    public String getFirstName() {
+    public String getFirstname() {
         return this.firstname;
     }
 
-    public void setLastName(String name) {
+    public void setLastname(String name) {
         this.lastname = name;
     }
 
-    public String getLastName() {
+    public String getLastname() {
         return this.lastname;
     }
 }
