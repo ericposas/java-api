@@ -26,8 +26,8 @@ public class UsersController {
         return Handlers.routing()
                 .get("/users", noQueryParameters, controller.getUsers())
                 .get("/users/{id}", containsId, controller.getUser())
-                .post("/users", controller.createUser());
-        // .delete("/users/{id}", containsId, controller.deleteUser());
+                .post("/users", controller.createUser())
+                .delete("/users/{id}", containsId, controller.deleteUser());
     }
 
     public static void exceptionHandlers(ExceptionHandler exceptionHandler) {
@@ -65,6 +65,17 @@ public class UsersController {
             exchange.getResponseSender().send(created ? "Created new user" : "Could not create new user", UTF_8);
         };
         return (exchange) -> exchange.getRequestReceiver().receiveFullString(callback, UTF_8);
+    }
+
+    private HttpHandler deleteUser() {
+        return exchange -> {
+            String uid = exchange.getQueryParameters()
+                    .get("id")
+                    .getFirst();
+            boolean deleted = service.deleteUser(Integer.parseInt(uid));
+            exchange.setStatusCode(io.undertow.util.StatusCodes.NO_CONTENT);
+            exchange.getResponseSender().send(deleted ? "Deleted user " + uid : "Could not delete user " + uid);
+        };
     }
 
 }

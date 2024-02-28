@@ -57,6 +57,10 @@ public class UsersService {
         return userToString;
     }
 
+    public boolean deleteUser(int id) {
+        return userRepo.deleteOne(id);
+    }
+
     private static interface UsersServiceHolder {
         public static final UsersService HOLDER_INSTANCE = new UsersService();
     }

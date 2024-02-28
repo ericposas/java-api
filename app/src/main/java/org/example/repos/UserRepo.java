@@ -33,6 +33,19 @@ public class UserRepo {
         }
     }
 
+    public boolean deleteOne(int id) {
+        try {
+            db = DB.connect();
+            PreparedStatement stmt = db.prepareStatement("DELETE FROM USERS WHERE id = ?");
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public User findOne(int id) {
         User user = new User();
         try {
