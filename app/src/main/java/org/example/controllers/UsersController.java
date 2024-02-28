@@ -50,8 +50,10 @@ public class UsersController {
 
     private HttpHandler getUser() {
         return exchange -> {
-            var id = exchange.getQueryParameters().get("id").getFirst();
-            String user = service.getUser(Integer.parseInt(id));
+            String uid = exchange.getQueryParameters()
+                    .get("id")
+                    .getFirst();
+            String user = service.getUser(Integer.parseInt(uid));
             exchange.getResponseHeaders().put(CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(user, UTF_8);
         };

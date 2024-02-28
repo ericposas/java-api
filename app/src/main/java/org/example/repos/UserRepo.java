@@ -15,7 +15,7 @@ public class UserRepo {
 
     private Connection db = DB.getDbConnection();
 
-    public boolean createUser(User user) {
+    public boolean createOne(User user) {
         try {
             db = DB.connect();
             if (user.getFirstname() != null && user.getLastname() != null) {
@@ -50,8 +50,7 @@ public class UserRepo {
         User user = new User();
         try {
             db = DB.connect();
-            PreparedStatement stmt = db.prepareStatement(
-                    "SELECT * FROM Users WHERE id = ?");
+            PreparedStatement stmt = db.prepareStatement("SELECT * FROM Users WHERE id = ?");
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -67,7 +66,7 @@ public class UserRepo {
         }
     }
 
-    public List<User> find() {
+    public List<User> findAll() {
         List<User> users = new ArrayList<>();
         try {
             db = DB.connect();

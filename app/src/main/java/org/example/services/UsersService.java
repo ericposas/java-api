@@ -28,7 +28,7 @@ public class UsersService {
         ObjectMapper om = new ObjectMapper();
         try {
             User user = om.readValue(payload, User.class);
-            return userRepo.createUser(user);
+            return userRepo.createOne(user);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return false;
@@ -36,7 +36,7 @@ public class UsersService {
     }
 
     public String getUsers() {
-        List<User> users = userRepo.find();
+        List<User> users = userRepo.findAll();
         String usersToString = "";
         try {
             usersToString = objWriter.writeValueAsString(users);
