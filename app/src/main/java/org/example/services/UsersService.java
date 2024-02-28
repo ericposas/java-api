@@ -24,8 +24,15 @@ public class UsersService {
         return UsersServiceHolder.HOLDER_INSTANCE;
     }
 
-    public boolean createUser(User user) {
-        return userRepo.createUser(user);
+    public boolean createUser(String payload) {
+        ObjectMapper om = new ObjectMapper();
+        try {
+            User user = om.readValue(payload, User.class);
+            return userRepo.createUser(user);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public String getUsers() {
