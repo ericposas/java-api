@@ -3,17 +3,12 @@
  */
 package org.example;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.example.controllers.StartController;
 import org.example.controllers.UsersController;
-import org.example.database.DB;
 import org.example.seeders.Seeder;
-
-import com.github.javafaker.Faker;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -23,7 +18,6 @@ import io.undertow.server.handlers.accesslog.AccessLogHandler;
 
 public class App {
 
-    private static Connection db;
     private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(App.class.getName());
 
     public static void main(String[] args) {
@@ -43,120 +37,26 @@ public class App {
                 .build()
                 .start();
 
-        // Generate tables
-        try {
-            db = DB.connect();
-            java.sql.Statement create = db.createStatement();
-            create.executeQuery("CREATE TABLE IF NOT EXISTS USERS (\r\n" + //
-                    "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    firstname VARCHAR(255),\r\n" + //
-                    "    lastname VARCHAR(255)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE TABLE IF NOT EXISTS ADDRESSES (\r\n" + //
-                    "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    line1 VARCHAR(255),\r\n" + //
-                    "    line2 VARCHAR(255),\r\n" + //
-                    "    city VARCHAR(255),\r\n" + //
-                    "    postalcode VARCHAR(255),\r\n" + //
-                    "    stateprovince VARCHAR(255),\r\n" + //
-                    "    countryid VARCHAR(255),\r\n" + //
-                    "    UNIQUE(line1)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE TABLE IF NOT EXISTS USERSADDRESSES (\r\n" + //
-                    "    user_id INT,\r\n" + //
-                    "    address_id INT,\r\n" + //
-                    "    isprimary BOOLEAN,\r\n" + //
-                    "    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,\r\n" + //
-                    "    FOREIGN KEY (address_id) REFERENCES ADDRESSES(id) ON DELETE CASCADE,\r\n" + //
-                    "    UNIQUE(address_id),\r\n" + //
-                    "    PRIMARY KEY(user_id, address_id)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS firstname_search ON USERS(firstname);\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lastname_search ON USERS(lastname);\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lowercase_firstname_search ON USERS(lower(firstname));\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lowercase_lastname_search ON USERS(lower(lastname));").close();
-            System.out.println("Generated tables");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        // DB seeding tasks
+        Seeder.generateTables();
 
-        // Seed some users if none exist
-        try {
-            db = DB.connect();
-            java.sql.Statement query = db.createStatement();
-            ResultSet rs = query.executeQuery("SELECT * FROM USERS");
-            if (!rs.isBeforeFirst()) {
-                int end = 100;
-                Faker faker = new Faker();
-                String stmtString = "INSERT INTO USERS (firstname, lastname) VALUES ";
-                for (int i = 0; i < end; i++) {
-                    if (i == end - 1) {
-                        stmtString += "(?,?);";
-                    } else {
-                        stmtString += "(?,?),";
-                    }
-                }
-                PreparedStatement stmt = db.prepareStatement(stmtString);
-                var count = 1;
-                for (int j = 0; j < end; j++) {
-                    stmt.setString(count, faker.name().firstName());
-                    stmt.setString(count + 1, faker.name().lastName());
-                    count += 2;
-                }
-                stmt.executeQuery();
-                System.out.println("Generated " + end + " users");
-            }
-            db.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        List<String> usersColumns = new ArrayList<>();
+        usersColumns.add("firstname");
+        usersColumns.add("lastname");
+        Seeder.seedEntities(100, "USERS", usersColumns);
 
-        // Seed some addresses if none exist
-        try {
-            db = DB.connect();
-            java.sql.Statement query = db.createStatement();
-            ResultSet rs = query.executeQuery("SELECT * FROM ADDRESSES");
-            if (!rs.isBeforeFirst()) {
-                int end = 100;
-                Faker faker = new Faker();
-                String stmtString = "INSERT INTO ADDRESSES (line1, city, postalcode, stateprovince, countryid) VALUES ";
-                for (int i = 0; i < end; i++) {
-                    if (i == end - 1) {
-                        stmtString += "(?,?,?,?,?);";
-                    } else {
-                        stmtString += "(?,?,?,?,?),";
-                    }
-                }
-                PreparedStatement stmt = db.prepareStatement(stmtString);
-                var count = 1;
-                for (int j = 0; j < end; j++) {
-                    stmt.setString(count, faker.address().streetAddress());
-                    stmt.setString(count + 1, faker.address().city());
-                    String state = faker.address().stateAbbr();
-                    stmt.setString(count + 2, faker.address().zipCodeByState(state));
-                    stmt.setString(count + 3, state);
-                    stmt.setString(count + 4, faker.address().countryCode());
-                    count += 5;
-                }
-                stmt.executeQuery();
-                System.out.println("Generated " + end + " addresses");
-            }
-            db.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        List<String> addressesColumns = new ArrayList<>();
+        addressesColumns.add("line1");
+        addressesColumns.add("city");
+        addressesColumns.add("postalcode");
+        addressesColumns.add("stateprovince");
+        addressesColumns.add("countryid");
+        Seeder.seedEntities(100, "ADDRESSES", addressesColumns);
 
         // for random user_id's between 1 to 100,
         // randomly associate none, one, or more addresses by id
         // via the join table USERSADDRESSES
         Seeder.attachUsersTo(100, "USERSADDRESSES", "address_id");
-
     }
 
 }
