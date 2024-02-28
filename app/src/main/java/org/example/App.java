@@ -7,12 +7,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Random;
 
 import org.example.controllers.StartController;
 import org.example.controllers.UsersController;
 import org.example.database.DB;
+import org.example.seeders.Seeder;
 
 import com.github.javafaker.Faker;
 
@@ -153,61 +152,10 @@ public class App {
             e.printStackTrace();
         }
 
-        // Randomly attach users to addresses if no fields in UsersAddresses exist
-        try {
-            db = DB.connect();
-            java.sql.Statement query = db.createStatement();
-            ResultSet rs = query.executeQuery("SELECT * FROM USERSADDRESSES");
-            if (!rs.isBeforeFirst()) {
-                int count = 1;
-                int end = 100;
-                HashMap<Integer, Integer> usermap = new HashMap<>();
-                HashMap<Integer, Integer> addressmap = new HashMap<>();
-                java.util.List<Integer> addressIds = new java.util.ArrayList<>();
-                for (int k = 0; k < end; k++) {
-                    Random random = new Random();
-                    int range = end - 1 + 1;
-                    int address_id = random.nextInt(range) + 1;
-                    if (addressmap.getOrDefault(address_id, 0).equals(0)) {
-                        addressmap.put(address_id, 1);
-                        addressIds.add(address_id);
-                    }
-                }
-                String stmtString = "INSERT INTO USERSADDRESSES (address_id, user_id, isprimary) VALUES ";
-                for (int i = 0; i < addressIds.size(); i++) {
-                    stmtString += "(?,?,?)";
-                    if (i == addressIds.size() - 1) {
-                        stmtString += ";";
-                    } else {
-                        stmtString += ",";
-                    }
-                }
-                PreparedStatement stmt = db.prepareStatement(stmtString);
-                for (int j = 0; j < addressIds.size(); j++) {
-                    Random random = new Random();
-                    int range = end - 1 + 1;
-                    int user_id = random.nextInt(range) + 1;
-                    if (usermap.getOrDefault(user_id, 0).equals(0)) {
-                        usermap.put(user_id, 1);
-                        stmt.setInt(count, addressIds.get(j));
-                        stmt.setInt(count + 1, user_id);
-                        stmt.setBoolean(count + 2, true);
-                    } else {
-                        usermap.put(user_id, usermap.get(user_id) + 1);
-                        stmt.setInt(count, addressIds.get(j));
-                        stmt.setInt(count + 1, user_id);
-                        stmt.setBoolean(count + 2, false);
-                    }
-                    count += 3;
-                }
-                stmt.executeQuery();
-            }
-            db.close();
-        } catch (
-
-        SQLException e) {
-            e.printStackTrace();
-        }
+        // for random user_id's between 1 to 100,
+        // randomly associate none, one, or more addresses by id
+        // via the join table USERSADDRESSES
+        Seeder.attachUsersTo(100, "USERSADDRESSES", "address_id");
 
     }
 
