@@ -3,11 +3,10 @@
  */
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.example.controllers.StartController;
 import org.example.controllers.UsersController;
+import org.example.database.DatabaseConfig;
+import org.example.exec.ReadSQL;
 import org.example.seeders.Seeder;
 
 import io.undertow.Handlers;
@@ -37,26 +36,25 @@ public class App {
                 .build()
                 .start();
 
-        // DB seeding tasks
-        Seeder.generateTables();
+        // Read SQL tables file
+        ReadSQL.readFile(DatabaseConfig.getDbUsername(), DatabaseConfig.getDbPassword(), DatabaseConfig.getDbUrl(),
+                DatabaseConfig.getSqlTablesFilepath());
 
-        List<String> usersColumns = new ArrayList<>();
-        usersColumns.add("firstname");
-        usersColumns.add("lastname");
-        Seeder.seedEntities(100, "USERS", usersColumns);
+        // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
+        // with various Entities!
+        Seeder.seedEntities(100, "USERS", new String[] { "firstname", "lastname" });
 
-        List<String> addressesColumns = new ArrayList<>();
-        addressesColumns.add("line1");
-        addressesColumns.add("city");
-        addressesColumns.add("postalcode");
-        addressesColumns.add("stateprovince");
-        addressesColumns.add("countryid");
-        Seeder.seedEntities(100, "ADDRESSES", addressesColumns);
+        Seeder.seedEntities(100, "ADDRESSES",
+                new String[] { "line1", "city", "postalcode", "stateprovince", "countryid" });
+
+        Seeder.seedEntities(100, "EMAILS", new String[] { "email" });
 
         // for random user_id's between 1 to 100,
         // randomly associate none, one, or more addresses by id
         // via the join table USERSADDRESSES
         Seeder.attachUsersTo(100, "USERSADDRESSES", "address_id");
+        // same as above, but for n number of email addresses
+        Seeder.attachUsersTo(100, "USERSEMAILS", "email_id");
     }
 
 }

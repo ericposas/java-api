@@ -15,6 +15,12 @@ CREATE TABLE IF NOT EXISTS ADDRESSES (
     UNIQUE(line1)
 );
 
+CREATE TABLE IF NOT EXISTS EMAILS (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    UNIQUE(email)
+);
+
 CREATE TABLE IF NOT EXISTS USERSADDRESSES (
     user_id INT,
     address_id INT,
@@ -25,6 +31,17 @@ CREATE TABLE IF NOT EXISTS USERSADDRESSES (
     PRIMARY KEY(user_id, address_id)
 );
 
+CREATE TABLE IF NOT EXISTS USERSEMAILS(
+    user_id INT,
+    email_id INT,
+    isprimary BOOLEAN,
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+    FOREIGN KEY (email_id) REFERENCES EMAILS(id) ON DELETE CASCADE,
+    UNIQUE(email_id),
+    PRIMARY KEY(user_id, email_id)
+);
+
+-- Users indexes
 CREATE INDEX IF NOT EXISTS firstname_search ON USERS(firstname);
 
 CREATE INDEX IF NOT EXISTS lastname_search ON USERS(lastname);
@@ -32,3 +49,15 @@ CREATE INDEX IF NOT EXISTS lastname_search ON USERS(lastname);
 CREATE INDEX IF NOT EXISTS lowercase_firstname_search ON USERS(lower(firstname));
 
 CREATE INDEX IF NOT EXISTS lowercase_lastname_search ON USERS(lower(lastname));
+
+-- Emails indexes
+CREATE INDEX IF NOT EXISTS email_search ON EMAILS(email);
+
+-- Addresses indexes
+CREATE INDEX IF NOT EXISTS address_line1_search ON ADDRESSES(line1);
+
+CREATE INDEX IF NOT EXISTS address_city_search ON ADDRESSES(city);
+
+CREATE INDEX IF NOT EXISTS address_zip_search ON ADDRESSES(postalcode);
+
+CREATE INDEX IF NOT EXISTS address_state_search ON ADDRESSES(stateprovince);

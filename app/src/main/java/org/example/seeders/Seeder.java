@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,61 +17,13 @@ import com.github.javafaker.Faker;
 
 public class Seeder {
 
-    public static String USERS = "USERS";
-    public static String ADDRESSES = "ADDRESSES";
-
     private static Connection db;
 
-    public static void generateTables() {
-        // Generate tables
-        try {
-            db = DB.connect();
-            java.sql.Statement create = db.createStatement();
-            create.executeQuery("CREATE TABLE IF NOT EXISTS USERS (\r\n" + //
-                    "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    firstname VARCHAR(255),\r\n" + //
-                    "    lastname VARCHAR(255)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE TABLE IF NOT EXISTS ADDRESSES (\r\n" + //
-                    "    id SERIAL PRIMARY KEY,\r\n" + //
-                    "    line1 VARCHAR(255),\r\n" + //
-                    "    line2 VARCHAR(255),\r\n" + //
-                    "    city VARCHAR(255),\r\n" + //
-                    "    postalcode VARCHAR(255),\r\n" + //
-                    "    stateprovince VARCHAR(255),\r\n" + //
-                    "    countryid VARCHAR(255),\r\n" + //
-                    "    UNIQUE(line1)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE TABLE IF NOT EXISTS USERSADDRESSES (\r\n" + //
-                    "    user_id INT,\r\n" + //
-                    "    address_id INT,\r\n" + //
-                    "    isprimary BOOLEAN,\r\n" + //
-                    "    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,\r\n" + //
-                    "    FOREIGN KEY (address_id) REFERENCES ADDRESSES(id) ON DELETE CASCADE,\r\n" + //
-                    "    UNIQUE(address_id),\r\n" + //
-                    "    PRIMARY KEY(user_id, address_id)\r\n" + //
-                    ");\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS firstname_search ON USERS(firstname);\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lastname_search ON USERS(lastname);\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lowercase_firstname_search ON USERS(lower(firstname));\r\n" + //
-                    "\r\n" + //
-                    "CREATE INDEX IF NOT EXISTS lowercase_lastname_search ON USERS(lower(lastname));").close();
-            System.out.println("Generated tables");
-        } catch (SQLException e) {
-            if (e.getErrorCode() != 0) {
-                e.printStackTrace();
-            } else {
-                System.out.println("Generated tables");
-            }
-        }
-    }
+    public static String USERS = "USERS";
+    public static String EMAILS = "EMAILS";
+    public static String ADDRESSES = "ADDRESSES";
 
-    public static void seedEntities(int iterateTo, String tableName, List<String> columns) {
+    public static void seedEntities(int iterateTo, String tableName, String[] columns) {
         // Seed some of X entity if none exist
         try {
             db = DB.connect();
@@ -79,8 +32,9 @@ public class Seeder {
             if (!rs.isBeforeFirst()) {
                 int end = iterateTo;
                 Faker faker = new Faker();
-                int columnsCount = (int) columns.stream().count();
-                String columnsToString = columns.stream()
+                int columnsCount = (int) columns.length;
+                String columnsToString = Arrays.asList(columns)
+                        .stream()
                         .map(Object::toString)
                         .collect(java.util.stream.Collectors.joining(","));
                 String stmtString = "INSERT INTO " + tableName
@@ -114,9 +68,23 @@ public class Seeder {
                         count += 5;
                     }
                     if (tableName.equals(USERS)) {
-                        stmt.setString(count, faker.name().firstName());
-                        stmt.setString(count + 1, faker.name().lastName());
+                        var firstname = faker.name().firstName();
+                        var lastname = faker.name().lastName();
+                        stmt.setString(count, firstname);
+                        stmt.setString(count + 1, lastname);
                         count += 2;
+                    }
+                    if (tableName.equals(EMAILS)) {
+                        var firstAnimal = faker.animal().name();
+                        var first = firstAnimal.split(" ").length > 1
+                                ? firstAnimal.split(" ")[0] + firstAnimal.split(" ")[1]
+                                : firstAnimal;
+                        var lastAnimal = faker.animal().name();
+                        var last = lastAnimal.split(" ").length > 1
+                                ? lastAnimal.split(" ")[0] + lastAnimal.split(" ")[1]
+                                : lastAnimal;
+                        stmt.setString(count, first + "." + last + "@" + faker.internet().domainName());
+                        count++;
                     }
                 }
                 stmt.executeQuery();
@@ -148,10 +116,10 @@ public class Seeder {
                 for (int k = 0; k < end; k++) {
                     java.util.Random random = new Random();
                     int range = end - 1 + 1;
-                    int address_id = random.nextInt(range) + 1;
-                    if (entityMap.getOrDefault(address_id, 0).equals(0)) {
-                        entityMap.put(address_id, 1);
-                        entityIds.add(address_id);
+                    int entity_id = random.nextInt(range) + 1;
+                    if (entityMap.getOrDefault(entity_id, 0).equals(0)) {
+                        entityMap.put(entity_id, 1);
+                        entityIds.add(entity_id);
                     }
                 }
                 String stmtString = "INSERT INTO " + tableName + " (" + entityIdColumn
