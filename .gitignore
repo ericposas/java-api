@@ -5,5 +5,6 @@
 build
 
 # Ignore db connection properties file
-app/src/main/resources/*.properties
+app/src/main/resources/db.properties
+app/src/main/resources/sql.properties
 
