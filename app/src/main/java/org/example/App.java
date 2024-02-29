@@ -6,6 +6,7 @@ package org.example;
 import org.example.controllers.StartController;
 import org.example.controllers.UsersController;
 import org.example.database.DatabaseConfig;
+import org.example.database.SQLConfig;
 import org.example.exec.ReadSQL;
 import org.example.seeders.Seeder;
 
@@ -38,7 +39,7 @@ public class App {
 
         // Read SQL tables file
         ReadSQL.readFile(DatabaseConfig.getDbUsername(), DatabaseConfig.getDbPassword(), DatabaseConfig.getDbUrl(),
-                DatabaseConfig.getSqlTablesFilepath());
+                SQLConfig.getTableGenFilePath());
 
         // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
         // with various Entities!

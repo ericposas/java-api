@@ -57,46 +57,31 @@ public class Seeder {
                 }
                 PreparedStatement stmt = db.prepareStatement(stmtString);
                 var count = 1;
+                UserMaker um = new UserMaker(2);
+                AddressMaker am = new AddressMaker(5);
+                EmailMaker em = new EmailMaker(1);
                 for (int j = 0; j < end; j++) {
-                    if (tableName.equals(ADDRESSES)) {
-                        stmt.setString(count, faker.address().streetAddress());
-                        stmt.setString(count + 1, faker.address().city());
-                        String state = faker.address().stateAbbr();
-                        stmt.setString(count + 2, faker.address().zipCodeByState(state));
-                        stmt.setString(count + 3, state);
-                        stmt.setString(count + 4, faker.address().countryCode());
-                        count += 5;
-                    }
                     if (tableName.equals(USERS)) {
-                        var firstname = faker.name().firstName();
-                        var lastname = faker.name().lastName();
-                        stmt.setString(count, firstname);
-                        stmt.setString(count + 1, lastname);
-                        count += 2;
+                        um.makeEntry(stmt, count, faker);
+                        count = um.iterateCount(count);
+                    }
+                    if (tableName.equals(ADDRESSES)) {
+                        am.makeEntry(stmt, count, faker);
+                        count = am.iterateCount(count);
                     }
                     if (tableName.equals(EMAILS)) {
-                        var firstAnimal = faker.animal().name();
-                        var first = firstAnimal.split(" ").length > 1
-                                ? firstAnimal.split(" ")[0] + firstAnimal.split(" ")[1]
-                                : firstAnimal;
-                        var lastAnimal = faker.animal().name();
-                        var last = lastAnimal.split(" ").length > 1
-                                ? lastAnimal.split(" ")[0] + lastAnimal.split(" ")[1]
-                                : lastAnimal;
-                        stmt.setString(count, first + "." + last + "@" + faker.internet().domainName());
-                        count++;
+                        em.makeEntry(stmt, count, faker);
+                        count = em.iterateCount(count);
                     }
                 }
                 stmt.executeQuery();
                 System.out.println("Generated " + end + tableName.toLowerCase());
+                System.out.println("Seeded " + tableName);
             }
             db.close();
-            System.out.println("Seeded " + tableName);
         } catch (SQLException e) {
             if (e.getErrorCode() != 0) {
                 e.printStackTrace();
-            } else {
-                System.out.println("Seeded " + tableName);
             }
         }
     }
@@ -151,14 +136,12 @@ public class Seeder {
                     count += 3;
                 }
                 stmt.executeQuery();
+                System.out.println("Randomly attached n " + entityIdColumn.split("_")[0] + " entities " + "to User(s)");
             }
             db.close();
-            System.out.println("Randomly attached n " + entityIdColumn.split("_")[0] + " entities " + "to User(s)");
         } catch (SQLException e) {
             if (e.getErrorCode() != 0) {
                 e.printStackTrace();
-            } else {
-                System.out.println("Randomly attached n " + entityIdColumn.split("_")[0] + " entities " + "to User(s)");
             }
         }
     }

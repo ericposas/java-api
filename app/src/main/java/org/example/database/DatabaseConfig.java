@@ -31,8 +31,4 @@ public class DatabaseConfig {
         return properties.getProperty("db.password");
     }
 
-    public static String getSqlTablesFilepath() {
-        return properties.getProperty("db.sqltablesfilepath");
-    }
-
 }
