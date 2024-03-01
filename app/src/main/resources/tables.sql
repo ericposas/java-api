@@ -21,6 +21,22 @@ CREATE TABLE IF NOT EXISTS EMAILS (
     UNIQUE(email)
 );
 
+CREATE TABLE IF NOT EXISTS PHONENUMBERS (
+    id SERIAL PRIMARY KEY,
+    phonenumber VARCHAR(255),
+    phonetype VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS USERSPHONENUMBERS (
+    user_id INT,
+    phonenumber_id INT,
+    isprimary BOOLEAN,
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+    FOREIGN KEY (phonenumber_id) REFERENCES PHONENUMBERS(id) ON DELETE CASCADE,
+    UNIQUE(phonenumber_id),
+    PRIMARY KEY(user_id, phonenumber_id)
+);
+
 CREATE TABLE IF NOT EXISTS USERSADDRESSES (
     user_id INT,
     address_id INT,

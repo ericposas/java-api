@@ -44,18 +44,17 @@ public class App {
         // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
         // with various Entities!
         Seeder.seedEntities(100, "USERS", new String[] { "firstname", "lastname" });
-
         Seeder.seedEntities(100, "ADDRESSES",
                 new String[] { "line1", "city", "postalcode", "stateprovince", "countryid" });
-
         Seeder.seedEntities(100, "EMAILS", new String[] { "email" });
+        Seeder.seedEntities(100, "PHONENUMBERS", new String[] { "phonenumber", "phonetype" });
 
         // for random user_id's between 1 to 100,
         // randomly associate none, one, or more addresses by id
-        // via the join table USERSADDRESSES
+        // via the join table "USERSXXXXXXX"
         Seeder.attachUsersTo(100, "USERSADDRESSES", "address_id");
-        // same as above, but for n number of email addresses
         Seeder.attachUsersTo(100, "USERSEMAILS", "email_id");
+        Seeder.attachUsersTo(100, "USERSPHONENUMBERS", "phonenumber_id");
     }
 
 }

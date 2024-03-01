@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
@@ -22,6 +23,7 @@ public class Seeder {
     public static String USERS = "USERS";
     public static String EMAILS = "EMAILS";
     public static String ADDRESSES = "ADDRESSES";
+    public static String PHONENUMBERS = "PHONENUMBERS";
 
     public static void seedEntities(int iterateTo, String tableName, String[] columns) {
         // Seed some of X entity if none exist
@@ -31,7 +33,7 @@ public class Seeder {
             ResultSet rs = query.executeQuery("SELECT * FROM " + tableName);
             if (!rs.isBeforeFirst()) {
                 int end = iterateTo;
-                Faker faker = new Faker();
+                Faker faker = new Faker(new Locale("us"));
                 int columnsCount = (int) columns.length;
                 String columnsToString = Arrays.asList(columns)
                         .stream()
@@ -60,6 +62,7 @@ public class Seeder {
                 UserMaker um = new UserMaker(2);
                 AddressMaker am = new AddressMaker(5);
                 EmailMaker em = new EmailMaker(1);
+                PhoneNumberMaker pm = new PhoneNumberMaker(2);
                 for (int j = 0; j < end; j++) {
                     if (tableName.equals(USERS)) {
                         um.makeEntry(stmt, count, faker);
@@ -72,6 +75,10 @@ public class Seeder {
                     if (tableName.equals(EMAILS)) {
                         em.makeEntry(stmt, count, faker);
                         count = em.iterateCount(count);
+                    }
+                    if (tableName.equals(PHONENUMBERS)) {
+                        pm.makeEntry(stmt, count, faker);
+                        count = pm.iterateCount(count);
                     }
                 }
                 stmt.executeQuery();
