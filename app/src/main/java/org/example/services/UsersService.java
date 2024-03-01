@@ -3,6 +3,7 @@ package org.example.services;
 import java.util.List;
 
 import org.example.objects.User;
+import org.example.objects.UsersDetailsDTO;
 import org.example.repos.UserRepo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,6 +60,17 @@ public class UsersService {
 
     public boolean deleteUser(int id) {
         return userRepo.deleteOne(id);
+    }
+
+    public String fetchUsersDetails(int id) {
+        UsersDetailsDTO usersDetails = userRepo.findUserDetails(id);
+        String usersAddressesToString = "";
+        try {
+            usersAddressesToString = objWriter.writeValueAsString(usersDetails);
+        } catch (JsonProcessingException e) {
+            System.err.println("could not translate UsersDetailDTO Objects to JSON");
+        }
+        return usersAddressesToString;
     }
 
     private static interface UsersServiceHolder {

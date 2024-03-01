@@ -27,7 +27,8 @@ public class UsersController {
                 .get("/users", noQueryParameters, controller.getUsers())
                 .get("/users/{id}", containsId, controller.getUser())
                 .post("/users", controller.createUser())
-                .delete("/users/{id}", containsId, controller.deleteUser());
+                .delete("/users/{id}", containsId, controller.deleteUser())
+                .get("/users/{id}/details", containsId, controller.getUsersAddresses());
     }
 
     public static void exceptionHandlers(ExceptionHandler exceptionHandler) {
@@ -77,6 +78,17 @@ public class UsersController {
             boolean deleted = service.deleteUser(Integer.parseInt(uid));
             exchange.setStatusCode(io.undertow.util.StatusCodes.NO_CONTENT);
             exchange.getResponseSender().send(deleted ? "Deleted user " + uid : "Could not delete user " + uid);
+        };
+    }
+
+    private HttpHandler getUsersAddresses() {
+        return exchange -> {
+            String uid = exchange.getQueryParameters()
+                    .get("id")
+                    .getFirst();
+            String addresses = service.fetchUsersDetails(Integer.parseInt(uid));
+            exchange.getResponseHeaders().put(CONTENT_TYPE, "application/json");
+            exchange.getResponseSender().send(addresses, UTF_8);
         };
     }
 

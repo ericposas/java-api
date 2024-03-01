@@ -9,7 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.example.database.DB;
+import org.example.objects.Address;
+import org.example.objects.Phonenumber;
 import org.example.objects.User;
+import org.example.objects.UsersAddressesDTO;
+import org.example.objects.UsersDetailsDTO;
 
 public class UserRepo {
 
@@ -82,9 +86,106 @@ public class UserRepo {
             db.close();
             return users;
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            List<User> emptyList = new ArrayList<>();
-            return emptyList;
+            e.printStackTrace();
+            return users;
+        }
+    }
+
+    public UsersAddressesDTO findAddressesForUser(int id) {
+        UsersAddressesDTO usersaddresses = new UsersAddressesDTO();
+        try {
+            db = DB.connect();
+            String query = "select u.*, a.*, ua.*\r\n" + //
+                    "from users u\r\n" + //
+                    "join usersaddresses ua on ua.user_id = u.id\r\n" + //
+                    "join addresses a on a.id = ua.address_id\r\n" + //
+                    "where u.id = ?";
+            PreparedStatement stmt = db.prepareStatement(query);
+            stmt.setInt(1, id);
+            ResultSet result = stmt.executeQuery();
+            User user = new User();
+            List<Address> addresses = new ArrayList<>();
+            while (result.next()) {
+                Address address = new Address();
+                address.setId(result.getInt("address_id"));
+                address.setIsprimary(result.getBoolean("isprimary"));
+                address.setLine1(result.getString("line1"));
+                address.setLine2(result.getString("line2"));
+                address.setCity(result.getString("city"));
+                address.setStateprovince(result.getString("stateprovince"));
+                address.setPostalcode(result.getString("postalcode"));
+                address.setCountryid(result.getString("countryid"));
+                addresses.add(address);
+                if (user.getFirstname() == null) {
+                    user.setId(result.getInt("user_id"));
+                    user.setFirstname(result.getString("firstname"));
+                    user.setLastname(result.getString("lastname"));
+                }
+            }
+            usersaddresses.setAddresses(addresses);
+            usersaddresses.setUser(user);
+            return usersaddresses;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return usersaddresses;
+        }
+    }
+
+    public UsersDetailsDTO findUserDetails(int id) {
+        UsersDetailsDTO userDetails = new UsersDetailsDTO();
+        try {
+            db = DB.connect();
+            String addressQuery = "select u.*, a.*, ua.*\r\n" + //
+                    "from users u\r\n" + //
+                    "join usersaddresses ua on ua.user_id = u.id\r\n" + //
+                    "join addresses a on a.id = ua.address_id\r\n" + //
+                    "where u.id = ?";
+            PreparedStatement stmt = db.prepareStatement(addressQuery);
+            stmt.setInt(1, id);
+            ResultSet addressRs = stmt.executeQuery();
+            User user = new User();
+            List<Address> addresses = new ArrayList<>();
+            while (addressRs.next()) {
+                Address address = new Address();
+                address.setId(addressRs.getInt("address_id"));
+                address.setIsprimary(addressRs.getBoolean("isprimary"));
+                address.setLine1(addressRs.getString("line1"));
+                address.setLine2(addressRs.getString("line2"));
+                address.setCity(addressRs.getString("city"));
+                address.setStateprovince(addressRs.getString("stateprovince"));
+                address.setPostalcode(addressRs.getString("postalcode"));
+                address.setCountryid(addressRs.getString("countryid"));
+                addresses.add(address);
+                if (user.getFirstname() == null) {
+                    user.setId(addressRs.getInt("user_id"));
+                    user.setFirstname(addressRs.getString("firstname"));
+                    user.setLastname(addressRs.getString("lastname"));
+                }
+            }
+            String phoneQuery = "select u.*, up.*, p.phonenumber, p.phonetype\r\n" + //
+                    "from users u\r\n" + //
+                    "join usersphonenumbers up on up.user_id = u.id\r\n" + //
+                    "left join phonenumbers p on p.id = up.phonenumber_id\r\n" + //
+                    "where u.id = ?;";
+            PreparedStatement pStmt = db.prepareStatement(phoneQuery);
+            pStmt.setInt(1, id);
+            ResultSet pRs = pStmt.executeQuery();
+            List<Phonenumber> numbers = new ArrayList<>();
+            while (pRs.next()) {
+                Phonenumber phone = new Phonenumber();
+                phone.setId(pRs.getInt("phonenumber_id"));
+                phone.setIsprimary(pRs.getBoolean("isprimary"));
+                phone.setPhonenumber(pRs.getString("phonenumber"));
+                phone.setPhonetype(pRs.getString("phonetype"));
+                numbers.add(phone);
+            }
+            userDetails.setAddresses(addresses);
+            userDetails.setPhonenumbers(numbers);
+            userDetails.setUser(user);
+            return userDetails;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return userDetails;
         }
     }
 
