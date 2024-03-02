@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.example.database.DB;
 import org.example.objects.Address;
+import org.example.objects.Emailaddress;
 import org.example.objects.Phonenumber;
 import org.example.objects.User;
 import org.example.objects.UsersAddressesDTO;
@@ -135,15 +136,20 @@ public class UserRepo {
         UsersDetailsDTO userDetails = new UsersDetailsDTO();
         try {
             db = DB.connect();
-            String addressQuery = "select u.*, a.*, ua.*\r\n" + //
-                    "from users u\r\n" + //
-                    "join usersaddresses ua on ua.user_id = u.id\r\n" + //
-                    "join addresses a on a.id = ua.address_id\r\n" + //
-                    "where u.id = ?";
+            User user = new User();
+            String userQuery = "select * from users where id = ?";
+            PreparedStatement uStmt = db.prepareStatement(userQuery);
+            uStmt.setInt(1, id);
+            ResultSet uRs = uStmt.executeQuery();
+            while (uRs.next()) {
+                user.setId(uRs.getInt("id"));
+                user.setFirstname(uRs.getString("firstname"));
+                user.setLastname(uRs.getString("lastname"));
+            }
+            String addressQuery = "select u.*, ua.*, a.* from users u join usersaddresses ua on ua.user_id = u.id join addresses a on a.id = ua.address_id where u.id = ?";
             PreparedStatement stmt = db.prepareStatement(addressQuery);
             stmt.setInt(1, id);
             ResultSet addressRs = stmt.executeQuery();
-            User user = new User();
             List<Address> addresses = new ArrayList<>();
             while (addressRs.next()) {
                 Address address = new Address();
@@ -156,17 +162,8 @@ public class UserRepo {
                 address.setPostalcode(addressRs.getString("postalcode"));
                 address.setCountryid(addressRs.getString("countryid"));
                 addresses.add(address);
-                if (user.getFirstname() == null) {
-                    user.setId(addressRs.getInt("user_id"));
-                    user.setFirstname(addressRs.getString("firstname"));
-                    user.setLastname(addressRs.getString("lastname"));
-                }
             }
-            String phoneQuery = "select u.*, up.*, p.phonenumber, p.phonetype\r\n" + //
-                    "from users u\r\n" + //
-                    "join usersphonenumbers up on up.user_id = u.id\r\n" + //
-                    "left join phonenumbers p on p.id = up.phonenumber_id\r\n" + //
-                    "where u.id = ?;";
+            String phoneQuery = "select u.*, up.*, p.* from users u join usersphonenumbers up on up.user_id = u.id left join phonenumbers p on p.id = up.phonenumber_id where u.id = ?;";
             PreparedStatement pStmt = db.prepareStatement(phoneQuery);
             pStmt.setInt(1, id);
             ResultSet pRs = pStmt.executeQuery();
@@ -179,8 +176,21 @@ public class UserRepo {
                 phone.setPhonetype(pRs.getString("phonetype"));
                 numbers.add(phone);
             }
+            String emailQuery = "select e.*, ue.*, u.* from users u join usersemails ue on ue.user_id = u.id join emails e on e.id = ue.email_id where u.id = ?;";
+            PreparedStatement eStmt = db.prepareStatement(emailQuery);
+            eStmt.setInt(1, id);
+            ResultSet eRs = eStmt.executeQuery();
+            List<Emailaddress> emailaddresses = new ArrayList<>();
+            while (eRs.next()) {
+                Emailaddress email = new Emailaddress();
+                email.setId(eRs.getInt("email_id"));
+                email.setIsprimary(eRs.getBoolean("isprimary"));
+                email.setEmail(eRs.getString("email"));
+                emailaddresses.add(email);
+            }
             userDetails.setAddresses(addresses);
             userDetails.setPhonenumbers(numbers);
+            userDetails.setEmailaddresses(emailaddresses);
             userDetails.setUser(user);
             return userDetails;
         } catch (SQLException e) {

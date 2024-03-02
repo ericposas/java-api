@@ -64,13 +64,13 @@ public class UsersService {
 
     public String fetchUsersDetails(int id) {
         UsersDetailsDTO usersDetails = userRepo.findUserDetails(id);
-        String usersAddressesToString = "";
+        String usersDetailsToString = "";
         try {
-            usersAddressesToString = objWriter.writeValueAsString(usersDetails);
+            usersDetailsToString = objWriter.writeValueAsString(usersDetails);
         } catch (JsonProcessingException e) {
-            System.err.println("could not translate UsersDetailDTO Objects to JSON");
+            System.err.println("Could not translate UserDetailsDTO object to JSON");
         }
-        return usersAddressesToString;
+        return usersDetailsToString;
     }
 
     private static interface UsersServiceHolder {

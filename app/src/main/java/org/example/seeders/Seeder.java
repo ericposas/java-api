@@ -107,7 +107,7 @@ public class Seeder {
                 List<Integer> entityIds = new ArrayList<>();
                 for (int k = 0; k < end; k++) {
                     java.util.Random random = new Random();
-                    int range = end - 1 + 1;
+                    int range = (end - 1) + 1;
                     int entity_id = random.nextInt(range) + 1;
                     if (entityMap.getOrDefault(entity_id, 0).equals(0)) {
                         entityMap.put(entity_id, 1);
@@ -127,8 +127,8 @@ public class Seeder {
                 PreparedStatement stmt = db.prepareStatement(stmtString);
                 for (int j = 0; j < entityIds.size(); j++) {
                     Random random = new Random();
-                    int range = end - 1 + 1;
-                    int user_id = random.nextInt(range) + 1;
+                    int range = (end - 1) + 1;
+                    Integer user_id = random.nextInt(range) + 1;
                     if (userMap.getOrDefault(user_id, 0).equals(0)) {
                         userMap.put(user_id, 1);
                         stmt.setInt(count, entityIds.get(j));
