@@ -41,20 +41,24 @@ public class App {
         ReadSQL.readFile(DatabaseConfig.getDbUsername(), DatabaseConfig.getDbPassword(), DatabaseConfig.getDbUrl(),
                 SQLConfig.getTableGenFilePath());
 
+        int userCount = 100;
+        int emailCount = 300;
+        int addressCount = 100;
+        int phoneNumberCount = 200;
         // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
         // with various Entities!
-        Seeder.seedEntities(100, "USERS", new String[] { "firstname", "lastname" });
-        Seeder.seedEntities(100, "ADDRESSES",
+        Seeder.seedEntities(userCount, "USERS", new String[] { "firstname", "lastname" });
+        Seeder.seedEntities(emailCount, "EMAILS", new String[] { "email" });
+        Seeder.seedEntities(addressCount, "ADDRESSES",
                 new String[] { "line1", "city", "postalcode", "stateprovince", "countryid" });
-        Seeder.seedEntities(100, "EMAILS", new String[] { "email" });
-        Seeder.seedEntities(100, "PHONENUMBERS", new String[] { "phonenumber", "phonetype" });
+        Seeder.seedEntities(phoneNumberCount, "PHONENUMBERS", new String[] { "phonenumber", "phonetype" });
 
         // for random user_id's between 1 to 100,
         // randomly associate none, one, or more addresses by id
         // via the join table "USERSXXXXXXX"
-        Seeder.attachUsersTo(100, "USERSADDRESSES", "address_id");
-        Seeder.attachUsersTo(100, "USERSEMAILS", "email_id");
-        Seeder.attachUsersTo(100, "USERSPHONENUMBERS", "phonenumber_id");
+        Seeder.attachUsersTo(100, emailCount, "USERSEMAILS", "email_id");
+        Seeder.attachUsersTo(100, addressCount, "USERSADDRESSES", "address_id");
+        Seeder.attachUsersTo(100, phoneNumberCount, "USERSPHONENUMBERS", "phonenumber_id");
     }
 
 }

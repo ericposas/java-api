@@ -93,7 +93,7 @@ public class Seeder {
         }
     }
 
-    public static void attachUsersTo(int iterateTo, String tableName, String entityIdColumn) {
+    public static void attachUsersTo(int usersCount, int entityCount, String tableName, String entityIdColumn) {
         // Randomly attach users to addresses if no fields in UsersAddresses exist
         try {
             db = DB.connect();
@@ -101,13 +101,12 @@ public class Seeder {
             ResultSet rs = query.executeQuery("SELECT * FROM " + tableName);
             if (!rs.isBeforeFirst()) {
                 int count = 1;
-                int end = iterateTo;
                 Map<Integer, Integer> userMap = new HashMap<>();
                 Map<Integer, Integer> entityMap = new HashMap<>();
                 List<Integer> entityIds = new ArrayList<>();
-                for (int k = 0; k < end; k++) {
+                for (int k = 0; k < entityCount; k++) {
                     java.util.Random random = new Random();
-                    int range = (end - 1) + 1;
+                    int range = (entityCount - 1) + 1;
                     int entity_id = random.nextInt(range) + 1;
                     if (entityMap.getOrDefault(entity_id, 0).equals(0)) {
                         entityMap.put(entity_id, 1);
@@ -127,7 +126,7 @@ public class Seeder {
                 PreparedStatement stmt = db.prepareStatement(stmtString);
                 for (int j = 0; j < entityIds.size(); j++) {
                     Random random = new Random();
-                    int range = (end - 1) + 1;
+                    int range = (usersCount - 1) + 1;
                     Integer user_id = random.nextInt(range) + 1;
                     if (userMap.getOrDefault(user_id, 0).equals(0)) {
                         userMap.put(user_id, 1);
