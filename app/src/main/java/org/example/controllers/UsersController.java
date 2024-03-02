@@ -28,7 +28,7 @@ public class UsersController {
                 .get("/users/{id}", containsId, controller.getUser())
                 .post("/users", controller.createUser())
                 .delete("/users/{id}", containsId, controller.deleteUser())
-                .get("/users/{id}/details", containsId, controller.getUsersAddresses());
+                .get("/users/{id}/details", containsId, controller.getUsersDetails());
     }
 
     public static void exceptionHandlers(ExceptionHandler exceptionHandler) {
@@ -81,7 +81,7 @@ public class UsersController {
         };
     }
 
-    private HttpHandler getUsersAddresses() {
+    private HttpHandler getUsersDetails() {
         return exchange -> {
             String uid = exchange.getQueryParameters()
                     .get("id")
