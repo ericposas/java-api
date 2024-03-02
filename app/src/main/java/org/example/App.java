@@ -47,7 +47,7 @@ public class App {
         int phoneNumberCount = 200;
         // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
         // with various Entities!
-        Seeder.seedEntities(userCount, "USERS", new String[] { "firstname", "lastname" });
+        Seeder.seedEntities(userCount, "USERS", new String[] { "firstname", "middlename", "lastname" });
         Seeder.seedEntities(emailCount, "EMAILS", new String[] { "email" });
         Seeder.seedEntities(addressCount, "ADDRESSES",
                 new String[] { "line1", "city", "postalcode", "stateprovince", "countryid" });

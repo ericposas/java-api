@@ -1,35 +1,36 @@
 CREATE TABLE IF NOT EXISTS USERS (
     id SERIAL PRIMARY KEY,
-    firstname VARCHAR(255),
-    lastname VARCHAR(255)
+    firstname VARCHAR(255) NOT NULL,
+    middlename VARCHAR(255),
+    lastname VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ADDRESSES (
     id SERIAL PRIMARY KEY,
-    line1 VARCHAR(255),
+    line1 VARCHAR(255) NOT NULL,
     line2 VARCHAR(255),
-    city VARCHAR(255),
-    postalcode VARCHAR(255),
-    stateprovince VARCHAR(255),
-    countryid VARCHAR(255),
+    city VARCHAR(255) NOT NULL,
+    postalcode VARCHAR(255) NOT NULL,
+    stateprovince VARCHAR(255) NOT NULL,
+    countryid VARCHAR(255) NOT NULL,
     UNIQUE(line1)
 );
 
 CREATE TABLE IF NOT EXISTS EMAILS (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(255),
+    email VARCHAR(255) NOT NULL,
     UNIQUE(email)
 );
 
 CREATE TABLE IF NOT EXISTS PHONENUMBERS (
     id SERIAL PRIMARY KEY,
-    phonenumber VARCHAR(255),
-    phonetype VARCHAR(255)
+    phonenumber VARCHAR(255) NOT NULL,
+    phonetype VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS USERSPHONENUMBERS (
-    user_id INT,
-    phonenumber_id INT,
+    user_id INT NOT NULL,
+    phonenumber_id INT NOT NULL,
     isprimary BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
     FOREIGN KEY (phonenumber_id) REFERENCES PHONENUMBERS(id) ON DELETE CASCADE,
@@ -38,8 +39,8 @@ CREATE TABLE IF NOT EXISTS USERSPHONENUMBERS (
 );
 
 CREATE TABLE IF NOT EXISTS USERSADDRESSES (
-    user_id INT,
-    address_id INT,
+    user_id INT NOT NULL,
+    address_id INT NOT NULL,
     isprimary BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
     FOREIGN KEY (address_id) REFERENCES ADDRESSES(id) ON DELETE CASCADE,
@@ -48,8 +49,8 @@ CREATE TABLE IF NOT EXISTS USERSADDRESSES (
 );
 
 CREATE TABLE IF NOT EXISTS USERSEMAILS(
-    user_id INT,
-    email_id INT,
+    user_id INT NOT NULL,
+    email_id INT NOT NULL,
     isprimary BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
     FOREIGN KEY (email_id) REFERENCES EMAILS(id) ON DELETE CASCADE,

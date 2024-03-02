@@ -2,6 +2,7 @@ package org.example.seeders;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Random;
 
 import com.github.javafaker.Faker;
 
@@ -16,8 +17,12 @@ public class UserMaker extends AddressMaker {
         try {
             var firstname = faker.name().firstName();
             var lastname = faker.name().lastName();
+            Random random = new Random();
+            var randomNum = random.nextInt((10 - 1) + 1) + 1;
+            var middlename = randomNum % 2 == 0 ? faker.name().firstName() : faker.funnyName().name();
             stmt.setString(count, firstname);
-            stmt.setString(count + 1, lastname);
+            stmt.setString(count + 1, middlename);
+            stmt.setString(count + 2, lastname);
         } catch (SQLException e) {
             e.printStackTrace();
         }

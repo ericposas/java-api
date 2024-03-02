@@ -59,7 +59,9 @@ public class Seeder {
                 }
                 PreparedStatement stmt = db.prepareStatement(stmtString);
                 var count = 1;
-                UserMaker um = new UserMaker(2);
+                // Fix: "count" should be internal to the implementation of the Maker,
+                // should not have to input the count on instantiation
+                UserMaker um = new UserMaker(3);
                 AddressMaker am = new AddressMaker(5);
                 EmailMaker em = new EmailMaker(1);
                 PhoneNumberMaker pm = new PhoneNumberMaker(2);

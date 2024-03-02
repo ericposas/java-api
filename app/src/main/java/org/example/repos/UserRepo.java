@@ -145,6 +145,7 @@ public class UserRepo {
                 user.setId(uRs.getInt("id"));
                 user.setFirstname(uRs.getString("firstname"));
                 user.setLastname(uRs.getString("lastname"));
+                user.setMiddlename(uRs.getString("middlename"));
             }
             String addressQuery = "select u.*, ua.*, a.* from users u join usersaddresses ua on ua.user_id = u.id join addresses a on a.id = ua.address_id where u.id = ?";
             PreparedStatement stmt = db.prepareStatement(addressQuery);
