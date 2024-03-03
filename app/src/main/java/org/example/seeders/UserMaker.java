@@ -19,7 +19,7 @@ public class UserMaker extends AddressMaker {
             var lastname = faker.name().lastName();
             Random random = new Random();
             var randomNum = random.nextInt((10 - 1) + 1) + 1;
-            var middlename = randomNum % 2 == 0 ? faker.name().firstName() : faker.funnyName().name();
+            var middlename = randomNum % 2 == 0 ? faker.name().firstName() : faker.funnyName().name().split(" ")[0];
             stmt.setString(count, firstname);
             stmt.setString(count + 1, middlename);
             stmt.setString(count + 2, lastname);

@@ -20,69 +20,109 @@ public class Seeder {
 
     private static Connection db;
 
-    public static String USERS = "USERS";
-    public static String EMAILS = "EMAILS";
-    public static String ADDRESSES = "ADDRESSES";
-    public static String PHONENUMBERS = "PHONENUMBERS";
+    public static final String USERS = "USERS";
+    public static final String EMAILS = "EMAILS";
+    public static final String ADDRESSES = "ADDRESSES";
+    public static final String PHONENUMBERS = "PHONENUMBERS";
 
-    public static void seedEntities(int iterateTo, String tableName, String[] columns) {
+    private static String[] USER_COLUMNS = new String[] { "firstname", "middlename", "lastname" };
+    private static String[] EMAIL_COLUMNS = new String[] { "email" };
+    private static String[] ADDRESS_COLUMNS = new String[] { "line1", "city", "stateprovince", "postalcode",
+            "countryid" };
+    private static String[] PHONENUMBER_COLUMNS = new String[] { "phonenumber", "phonetype" };
+
+    private static String[] getColumnsForEntity(String entityType) {
+        switch (entityType) {
+            case USERS:
+                return USER_COLUMNS;
+            case EMAILS:
+                return EMAIL_COLUMNS;
+            case ADDRESSES:
+                return ADDRESS_COLUMNS;
+            case PHONENUMBERS:
+                return PHONENUMBER_COLUMNS;
+            default:
+                return USER_COLUMNS;
+        }
+    }
+
+    private static void processEntries(String tableName, PreparedStatement stmt, Faker faker, int end, int count,
+            int columnsCount) {
+        if (tableName.equals(USERS)) {
+            UserMaker um = new UserMaker(columnsCount);
+            for (int j = 0; j < end; j++) {
+                um.makeEntry(stmt, count, faker);
+                count = um.iterateCount(count);
+            }
+        }
+        if (tableName.equals(ADDRESSES)) {
+            AddressMaker am = new AddressMaker(columnsCount);
+            for (int j = 0; j < end; j++) {
+                am.makeEntry(stmt, count, faker);
+                count = am.iterateCount(count);
+            }
+        }
+        if (tableName.equals(EMAILS)) {
+            EmailMaker em = new EmailMaker(columnsCount);
+            for (int j = 0; j < end; j++) {
+                em.makeEntry(stmt, count, faker);
+                count = em.iterateCount(count);
+            }
+        }
+        if (tableName.equals(PHONENUMBERS)) {
+            PhoneNumberMaker pm = new PhoneNumberMaker(columnsCount);
+            for (int j = 0; j < end; j++) {
+                pm.makeEntry(stmt, count, faker);
+                count = pm.iterateCount(count);
+            }
+        }
+    }
+
+    private static java.util.HashMap<String, String> processInsertStatement(String tableName, int end) {
+        String[] columns = getColumnsForEntity(tableName);
+        int columnsCount = (int) columns.length;
+        String columnsToString = Arrays.asList(columns)
+                .stream()
+                .map(Object::toString)
+                .collect(java.util.stream.Collectors.joining(","));
+        String stmtString = "INSERT INTO " + tableName
+                + " (" + columnsToString
+                + ") VALUES ";
+        String columnParams = "(";
+        for (int c = 0; c < columnsCount; c++) {
+            columnParams += "?";
+            if (c != columnsCount - 1) {
+                columnParams += ",";
+            }
+        }
+        columnParams += ")";
+        for (int i = 0; i < end; i++) {
+            if (i == end - 1) {
+                stmtString += columnParams + ";";
+            } else {
+                stmtString += columnParams + ",";
+            }
+        }
+        java.util.HashMap<String, String> map = new HashMap<>();
+        map.put("insertStatement", stmtString);
+        map.put("columnCount", String.valueOf(columnsCount));
+        return map;
+    }
+
+    public static void seedEntities(int iterateTo, String tableName) {
         // Seed some of X entity if none exist
         try {
             db = DB.connect();
             java.sql.Statement query = db.createStatement();
             ResultSet rs = query.executeQuery("SELECT * FROM " + tableName);
             if (!rs.isBeforeFirst()) {
+                var count = 1;
                 int end = iterateTo;
                 Faker faker = new Faker(new Locale("us"));
-                int columnsCount = (int) columns.length;
-                String columnsToString = Arrays.asList(columns)
-                        .stream()
-                        .map(Object::toString)
-                        .collect(java.util.stream.Collectors.joining(","));
-                String stmtString = "INSERT INTO " + tableName
-                        + " (" + columnsToString
-                        + ") VALUES ";
-                String columnParams = "(";
-                for (int c = 0; c < columnsCount; c++) {
-                    columnParams += "?";
-                    if (c != columnsCount - 1) {
-                        columnParams += ",";
-                    }
-                }
-                columnParams += ")";
-                for (int i = 0; i < end; i++) {
-                    if (i == end - 1) {
-                        stmtString += columnParams + ";";
-                    } else {
-                        stmtString += columnParams + ",";
-                    }
-                }
-                PreparedStatement stmt = db.prepareStatement(stmtString);
-                var count = 1;
-                // Fix: "count" should be internal to the implementation of the Maker,
-                // should not have to input the count on instantiation
-                UserMaker um = new UserMaker(3);
-                AddressMaker am = new AddressMaker(5);
-                EmailMaker em = new EmailMaker(1);
-                PhoneNumberMaker pm = new PhoneNumberMaker(2);
-                for (int j = 0; j < end; j++) {
-                    if (tableName.equals(USERS)) {
-                        um.makeEntry(stmt, count, faker);
-                        count = um.iterateCount(count);
-                    }
-                    if (tableName.equals(ADDRESSES)) {
-                        am.makeEntry(stmt, count, faker);
-                        count = am.iterateCount(count);
-                    }
-                    if (tableName.equals(EMAILS)) {
-                        em.makeEntry(stmt, count, faker);
-                        count = em.iterateCount(count);
-                    }
-                    if (tableName.equals(PHONENUMBERS)) {
-                        pm.makeEntry(stmt, count, faker);
-                        count = pm.iterateCount(count);
-                    }
-                }
+                java.util.HashMap<String, String> processedInsertResult = processInsertStatement(tableName, end);
+                PreparedStatement stmt = db.prepareStatement(processedInsertResult.get("insertStatement"));
+                processEntries(tableName, stmt, faker, end, count,
+                        Integer.parseInt(processedInsertResult.get("columnCount")));
                 stmt.executeQuery();
                 System.out.println("Generated " + end + tableName.toLowerCase());
                 System.out.println("Seeded " + tableName);
