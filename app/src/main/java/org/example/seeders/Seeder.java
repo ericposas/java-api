@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.example.database.DB;
+import org.jibx.schema.codegen.extend.DefaultNameConverter;
+import org.jibx.schema.codegen.extend.NameConverter;
 
 import com.github.javafaker.Faker;
 
@@ -135,13 +137,29 @@ public class Seeder {
         }
     }
 
-    public static void attachUsersTo(int usersCount, int entityCount, String tableName, String entityIdColumn) {
+    public static void attachEntitiesToUsers(String tableName) {
         // Randomly attach users to addresses if no fields in UsersAddresses exist
         try {
             db = DB.connect();
+            // first get the total count of users in the database
+            java.sql.Statement usersQ = db.createStatement();
+            ResultSet uRs = usersQ.executeQuery("SELECT COUNT(id) FROM USERS");
+            int usersCount = 0;
+            while (uRs.next()) {
+                usersCount = uRs.getInt("count");
+            }
+            // ResultSet .isBeforeFirst() checks if there are any results from the select
+            // query
             java.sql.Statement query = db.createStatement();
-            ResultSet rs = query.executeQuery("SELECT * FROM " + tableName);
+            ResultSet rs = query.executeQuery("SELECT * FROM USERS" + tableName);
             if (!rs.isBeforeFirst()) {
+                // get the total count of the chosen entities in the database
+                java.sql.Statement entityQ = db.createStatement();
+                ResultSet entRs = entityQ.executeQuery("SELECT COUNT(id) FROM " + tableName);
+                int entityCount = 0;
+                while (entRs.next()) {
+                    entityCount = entRs.getInt("count");
+                }
                 int count = 1;
                 Map<Integer, Integer> userMap = new HashMap<>();
                 Map<Integer, Integer> entityMap = new HashMap<>();
@@ -155,8 +173,9 @@ public class Seeder {
                         entityIds.add(entity_id);
                     }
                 }
-                String stmtString = "INSERT INTO " + tableName + " (" + entityIdColumn
-                        + ", user_id, isprimary) VALUES ";
+                NameConverter nameTools = new DefaultNameConverter();
+                String entId = nameTools.depluralize(tableName.toLowerCase()) + "_id";
+                String stmtString = "INSERT INTO USERS" + tableName + " (" + entId + ", user_id, isprimary) VALUES ";
                 for (int i = 0; i < entityIds.size(); i++) {
                     stmtString += "(?,?,?)";
                     if (i == entityIds.size() - 1) {
@@ -184,7 +203,7 @@ public class Seeder {
                     count += 3;
                 }
                 stmt.executeQuery();
-                System.out.println("Randomly attached n " + entityIdColumn.split("_")[0] + " entities " + "to User(s)");
+                System.out.println("Randomly attached n " + tableName + " entities " + "to User(s)");
             }
             db.close();
         } catch (SQLException e) {

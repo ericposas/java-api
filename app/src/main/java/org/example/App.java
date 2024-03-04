@@ -56,9 +56,9 @@ public class App {
                 // for random user_id's between 1 to 100,
                 // randomly associate none, one, or more addresses by id
                 // via the join table "USERSXXXXXXX"
-                Seeder.attachUsersTo(100, emailCount, "USERSEMAILS", "email_id");
-                Seeder.attachUsersTo(100, addressCount, "USERSADDRESSES", "address_id");
-                Seeder.attachUsersTo(100, phoneNumberCount, "USERSPHONENUMBERS", "phonenumber_id");
+                Seeder.attachEntitiesToUsers(Seeder.EMAILS);
+                Seeder.attachEntitiesToUsers(Seeder.ADDRESSES);
+                Seeder.attachEntitiesToUsers(Seeder.PHONENUMBERS);
         }
 
 }

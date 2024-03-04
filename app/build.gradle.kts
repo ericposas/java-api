@@ -41,6 +41,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
 
+    // https://mvnrepository.com/artifact/org.jibx/jibx-tools
+    implementation("org.jibx:jibx-tools:1.4.2")
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
