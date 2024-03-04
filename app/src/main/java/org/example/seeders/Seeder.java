@@ -135,7 +135,7 @@ public class Seeder {
                 e.printStackTrace();
             }
         }
-        if (!tableName.equals(ADDRESSES)) {
+        if (!tableName.equals(USERS)) {
             attachEntitiesToUsers(tableName);
         }
     }
