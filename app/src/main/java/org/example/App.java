@@ -52,13 +52,6 @@ public class App {
                 Seeder.seedEntities(emailCount, Seeder.EMAILS);
                 Seeder.seedEntities(addressCount, Seeder.ADDRESSES);
                 Seeder.seedEntities(phoneNumberCount, Seeder.PHONENUMBERS);
-
-                // for random user_id's between 1 to 100,
-                // randomly associate none, one, or more addresses by id
-                // via the join table "USERSXXXXXXX"
-                Seeder.attachEntitiesToUsers(Seeder.EMAILS);
-                Seeder.attachEntitiesToUsers(Seeder.ADDRESSES);
-                Seeder.attachEntitiesToUsers(Seeder.PHONENUMBERS);
         }
 
 }
