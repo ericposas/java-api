@@ -28,38 +28,38 @@ public class Seeder {
     public static void seedAll() {
         // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
         // with various Entities!
-        seedEntities(100, SeederHelper.USERS);
-        seedEntities(300, SeederHelper.EMAILS);
-        seedEntities(200, SeederHelper.ADDRESSES);
-        seedEntities(200, SeederHelper.PHONENUMBERS);
+        seedEntities(100, Constants.USERS);
+        seedEntities(300, Constants.EMAILS);
+        seedEntities(200, Constants.ADDRESSES);
+        seedEntities(200, Constants.PHONENUMBERS);
     }
 
-    private static void processEntries(String tableName, PreparedStatement stmt, int end, int count,
-            int columnsCount) {
+    private static void processEntries(String tableName, PreparedStatement stmt, int end) {
+        int count = 1;
         Faker faker = new Faker();
-        if (tableName.equals(SeederHelper.USERS)) {
-            UserMaker um = new UserMaker(columnsCount);
+        if (tableName.equals(Constants.USERS)) {
+            UserMaker um = new UserMaker();
             for (int j = 0; j < end; j++) {
                 um.makeEntry(stmt, count, faker);
                 count = um.iterateCount(count);
             }
         }
-        if (tableName.equals(SeederHelper.ADDRESSES)) {
-            AddressMaker am = new AddressMaker(columnsCount);
+        if (tableName.equals(Constants.ADDRESSES)) {
+            AddressMaker am = new AddressMaker();
             for (int j = 0; j < end; j++) {
                 am.makeEntry(stmt, count, faker);
                 count = am.iterateCount(count);
             }
         }
-        if (tableName.equals(SeederHelper.EMAILS)) {
-            EmailMaker em = new EmailMaker(columnsCount);
+        if (tableName.equals(Constants.EMAILS)) {
+            EmailMaker em = new EmailMaker();
             for (int j = 0; j < end; j++) {
                 em.makeEntry(stmt, count, faker);
                 count = em.iterateCount(count);
             }
         }
-        if (tableName.equals(SeederHelper.PHONENUMBERS)) {
-            PhoneNumberMaker pm = new PhoneNumberMaker(columnsCount);
+        if (tableName.equals(Constants.PHONENUMBERS)) {
+            PhoneNumberMaker pm = new PhoneNumberMaker();
             for (int j = 0; j < end; j++) {
                 pm.makeEntry(stmt, count, faker);
                 count = pm.iterateCount(count);
@@ -102,11 +102,10 @@ public class Seeder {
             java.sql.Statement query = db.createStatement();
             ResultSet rs = query.executeQuery("SELECT * FROM " + tableName);
             if (!rs.isBeforeFirst()) {
-                var count = 1;
                 int end = iterateTo;
                 String insertStatement = processInsertStatement(tableName, end);
                 PreparedStatement stmt = db.prepareStatement(insertStatement);
-                processEntries(tableName, stmt, end, count, SeederHelper.getColumnsForEntity(tableName).length);
+                processEntries(tableName, stmt, end);
                 stmt.executeQuery();
                 System.out.println("Generated " + end + tableName.toLowerCase());
                 System.out.println("Seeded " + tableName);
@@ -117,7 +116,7 @@ public class Seeder {
                 e.printStackTrace();
             }
         }
-        if (!tableName.equals(SeederHelper.USERS)) {
+        if (!tableName.equals(Constants.USERS)) {
             attachEntitiesToUsers(tableName);
         }
     }

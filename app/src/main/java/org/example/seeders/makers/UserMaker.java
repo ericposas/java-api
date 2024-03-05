@@ -4,12 +4,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.example.seeders.Constants;
+
 import com.github.javafaker.Faker;
 
-public class UserMaker extends AddressMaker {
+public class UserMaker extends BaseMaker {
 
-    public UserMaker(int iterationAmount) {
-        super(iterationAmount);
+    @Override
+    public int getCountIterationAmount() {
+        return Constants.USER_COLUMNS.length;
     }
 
     @Override

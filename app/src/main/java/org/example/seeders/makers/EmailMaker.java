@@ -3,12 +3,15 @@ package org.example.seeders.makers;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.example.seeders.Constants;
+
 import com.github.javafaker.Faker;
 
-public class EmailMaker extends AddressMaker {
+public class EmailMaker extends BaseMaker {
 
-    public EmailMaker(int iterationAmount) {
-        super(iterationAmount);
+    @Override
+    public int getCountIterationAmount() {
+        return Constants.EMAIL_COLUMNS.length;
     }
 
     @Override

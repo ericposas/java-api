@@ -3,24 +3,15 @@ package org.example.seeders.makers;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.example.seeders.Constants;
+
 import com.github.javafaker.Faker;
 
-public class AddressMaker implements RowEntryMaker {
-
-    public int iterationAmount;
-
-    public AddressMaker(int iterationAmount) {
-        this.iterationAmount = iterationAmount;
-    }
+public class AddressMaker extends BaseMaker {
 
     @Override
     public int getCountIterationAmount() {
-        return iterationAmount;
-    }
-
-    @Override
-    public int iterateCount(int count) {
-        return count += iterationAmount;
+        return Constants.ADDRESS_COLUMNS.length;
     }
 
     @Override
