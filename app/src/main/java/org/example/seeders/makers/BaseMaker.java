@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import com.github.javafaker.Faker;
 
-public class BaseMaker implements RowEntryMaker {
+public class BaseMaker<MakerType> implements IRowEntryMaker {
 
     @Override
     public int getCountIterationAmount() {

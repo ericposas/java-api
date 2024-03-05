@@ -4,11 +4,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.example.objects.Phonenumber;
 import org.example.seeders.Constants;
 
 import com.github.javafaker.Faker;
 
-public class PhoneNumberMaker extends BaseMaker {
+public class PhoneNumberMaker extends BaseMaker<Phonenumber> {
 
     @Override
     public int getCountIterationAmount() {

@@ -3,11 +3,12 @@ package org.example.seeders.makers;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.example.objects.Address;
 import org.example.seeders.Constants;
 
 import com.github.javafaker.Faker;
 
-public class AddressMaker extends BaseMaker {
+public class AddressMaker extends BaseMaker<Address> {
 
     @Override
     public int getCountIterationAmount() {

@@ -12,10 +12,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.example.database.DB;
-import org.example.seeders.makers.AddressMaker;
-import org.example.seeders.makers.EmailMaker;
-import org.example.seeders.makers.PhoneNumberMaker;
-import org.example.seeders.makers.UserMaker;
+import org.example.seeders.makers.IRowEntryMaker;
 import org.jibx.schema.codegen.extend.DefaultNameConverter;
 import org.jibx.schema.codegen.extend.NameConverter;
 
@@ -37,33 +34,14 @@ public class Seeder {
     private static void processEntries(String tableName, PreparedStatement stmt, int end) {
         int count = 1;
         Faker faker = new Faker();
-        if (tableName.equals(Constants.USERS)) {
-            UserMaker um = new UserMaker();
+        IRowEntryMaker maker = SeederHelper.getMaker(tableName);
+        try {
             for (int j = 0; j < end; j++) {
-                um.makeEntry(stmt, count, faker);
-                count = um.iterateCount(count);
+                maker.makeEntry(stmt, count, faker);
+                count = maker.iterateCount(count);
             }
-        }
-        if (tableName.equals(Constants.ADDRESSES)) {
-            AddressMaker am = new AddressMaker();
-            for (int j = 0; j < end; j++) {
-                am.makeEntry(stmt, count, faker);
-                count = am.iterateCount(count);
-            }
-        }
-        if (tableName.equals(Constants.EMAILS)) {
-            EmailMaker em = new EmailMaker();
-            for (int j = 0; j < end; j++) {
-                em.makeEntry(stmt, count, faker);
-                count = em.iterateCount(count);
-            }
-        }
-        if (tableName.equals(Constants.PHONENUMBERS)) {
-            PhoneNumberMaker pm = new PhoneNumberMaker();
-            for (int j = 0; j < end; j++) {
-                pm.makeEntry(stmt, count, faker);
-                count = pm.iterateCount(count);
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

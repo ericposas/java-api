@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import com.github.javafaker.Faker;
 
-public interface RowEntryMaker {
+public interface IRowEntryMaker {
     /**
      * 
      * @return the iteration amount
