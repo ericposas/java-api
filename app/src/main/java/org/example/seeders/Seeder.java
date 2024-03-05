@@ -25,6 +25,15 @@ public class Seeder {
 
     private static Connection db;
 
+    public static void seedAll() {
+        // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
+        // with various Entities!
+        seedEntities(100, SeederHelper.USERS);
+        seedEntities(300, SeederHelper.EMAILS);
+        seedEntities(200, SeederHelper.ADDRESSES);
+        seedEntities(200, SeederHelper.PHONENUMBERS);
+    }
+
     private static void processEntries(String tableName, PreparedStatement stmt, int end, int count,
             int columnsCount) {
         Faker faker = new Faker();

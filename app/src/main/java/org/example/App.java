@@ -5,11 +5,8 @@ package org.example;
 
 import org.example.controllers.StartController;
 import org.example.controllers.UsersController;
-import org.example.database.DatabaseConfig;
-import org.example.database.SQLConfig;
 import org.example.exec.ReadSQL;
 import org.example.seeders.Seeder;
-import org.example.seeders.SeederHelper;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -38,17 +35,9 @@ public class App {
                                 .build()
                                 .start();
 
-                // Read SQL tables file
-                ReadSQL.readFile(DatabaseConfig.getDbUsername(), DatabaseConfig.getDbPassword(),
-                                DatabaseConfig.getDbUrl(),
-                                SQLConfig.getTableGenFilePath());
+                ReadSQL.generateTables();
 
-                // IMPORTANT: Seeder.seedEntities has logic that needs custom if blocks to work
-                // with various Entities!
-                Seeder.seedEntities(100, SeederHelper.USERS);
-                Seeder.seedEntities(300, SeederHelper.EMAILS);
-                Seeder.seedEntities(200, SeederHelper.ADDRESSES);
-                Seeder.seedEntities(200, SeederHelper.PHONENUMBERS);
+                Seeder.seedAll();
         }
 
 }
