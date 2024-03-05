@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 import org.example.database.DB;
+import org.example.seeders.makers.AddressMaker;
+import org.example.seeders.makers.EmailMaker;
+import org.example.seeders.makers.PhoneNumberMaker;
+import org.example.seeders.makers.UserMaker;
 import org.jibx.schema.codegen.extend.DefaultNameConverter;
 import org.jibx.schema.codegen.extend.NameConverter;
 
@@ -22,56 +25,31 @@ public class Seeder {
 
     private static Connection db;
 
-    public static final String USERS = "USERS";
-    public static final String EMAILS = "EMAILS";
-    public static final String ADDRESSES = "ADDRESSES";
-    public static final String PHONENUMBERS = "PHONENUMBERS";
-
-    private static String[] USER_COLUMNS = new String[] { "firstname", "middlename", "lastname" };
-    private static String[] EMAIL_COLUMNS = new String[] { "email" };
-    private static String[] ADDRESS_COLUMNS = new String[] { "line1", "city", "stateprovince", "postalcode",
-            "countryid" };
-    private static String[] PHONENUMBER_COLUMNS = new String[] { "phonenumber", "phonetype" };
-
-    private static String[] getColumnsForEntity(String entityType) {
-        switch (entityType) {
-            case USERS:
-                return USER_COLUMNS;
-            case EMAILS:
-                return EMAIL_COLUMNS;
-            case ADDRESSES:
-                return ADDRESS_COLUMNS;
-            case PHONENUMBERS:
-                return PHONENUMBER_COLUMNS;
-            default:
-                return USER_COLUMNS;
-        }
-    }
-
-    private static void processEntries(String tableName, PreparedStatement stmt, Faker faker, int end, int count,
+    private static void processEntries(String tableName, PreparedStatement stmt, int end, int count,
             int columnsCount) {
-        if (tableName.equals(USERS)) {
+        Faker faker = new Faker();
+        if (tableName.equals(SeederHelper.USERS)) {
             UserMaker um = new UserMaker(columnsCount);
             for (int j = 0; j < end; j++) {
                 um.makeEntry(stmt, count, faker);
                 count = um.iterateCount(count);
             }
         }
-        if (tableName.equals(ADDRESSES)) {
+        if (tableName.equals(SeederHelper.ADDRESSES)) {
             AddressMaker am = new AddressMaker(columnsCount);
             for (int j = 0; j < end; j++) {
                 am.makeEntry(stmt, count, faker);
                 count = am.iterateCount(count);
             }
         }
-        if (tableName.equals(EMAILS)) {
+        if (tableName.equals(SeederHelper.EMAILS)) {
             EmailMaker em = new EmailMaker(columnsCount);
             for (int j = 0; j < end; j++) {
                 em.makeEntry(stmt, count, faker);
                 count = em.iterateCount(count);
             }
         }
-        if (tableName.equals(PHONENUMBERS)) {
+        if (tableName.equals(SeederHelper.PHONENUMBERS)) {
             PhoneNumberMaker pm = new PhoneNumberMaker(columnsCount);
             for (int j = 0; j < end; j++) {
                 pm.makeEntry(stmt, count, faker);
@@ -80,8 +58,8 @@ public class Seeder {
         }
     }
 
-    private static java.util.HashMap<String, String> processInsertStatement(String tableName, int end) {
-        String[] columns = getColumnsForEntity(tableName);
+    private static String processInsertStatement(String tableName, int end) {
+        String[] columns = SeederHelper.getColumnsForEntity(tableName);
         int columnsCount = (int) columns.length;
         String columnsToString = Arrays.asList(columns)
                 .stream()
@@ -105,10 +83,7 @@ public class Seeder {
                 stmtString += columnParams + ",";
             }
         }
-        java.util.HashMap<String, String> map = new HashMap<>();
-        map.put("insertStatement", stmtString);
-        map.put("columnCount", String.valueOf(columnsCount));
-        return map;
+        return stmtString;
     }
 
     public static void seedEntities(int iterateTo, String tableName) {
@@ -120,11 +95,9 @@ public class Seeder {
             if (!rs.isBeforeFirst()) {
                 var count = 1;
                 int end = iterateTo;
-                Faker faker = new Faker(new Locale("us"));
-                java.util.HashMap<String, String> processedInsertResult = processInsertStatement(tableName, end);
-                PreparedStatement stmt = db.prepareStatement(processedInsertResult.get("insertStatement"));
-                processEntries(tableName, stmt, faker, end, count,
-                        Integer.parseInt(processedInsertResult.get("columnCount")));
+                String insertStatement = processInsertStatement(tableName, end);
+                PreparedStatement stmt = db.prepareStatement(insertStatement);
+                processEntries(tableName, stmt, end, count, SeederHelper.getColumnsForEntity(tableName).length);
                 stmt.executeQuery();
                 System.out.println("Generated " + end + tableName.toLowerCase());
                 System.out.println("Seeded " + tableName);
@@ -135,7 +108,7 @@ public class Seeder {
                 e.printStackTrace();
             }
         }
-        if (!tableName.equals(USERS)) {
+        if (!tableName.equals(SeederHelper.USERS)) {
             attachEntitiesToUsers(tableName);
         }
     }

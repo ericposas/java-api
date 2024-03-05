@@ -1,4 +1,4 @@
-package org.example.seeders;
+package org.example.seeders.makers;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
