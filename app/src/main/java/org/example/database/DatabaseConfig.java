@@ -12,7 +12,7 @@ public class DatabaseConfig {
     static {
         InputStream input = null;
         try {
-            input = new FileInputStream("/home/eric/testproject/app/src/main/resources/db.properties");
+            input = new FileInputStream("/home/eric/java/testproject/app/src/main/resources/db.properties");
             properties.load(input);
         } catch (IOException e) {
             e.printStackTrace();

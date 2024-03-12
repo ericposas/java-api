@@ -7,6 +7,8 @@ import com.github.javafaker.Faker;
 
 public class BaseMaker<MakerType> implements IRowEntryMaker {
 
+    protected int iterationAmount;
+
     @Override
     public int getCountIterationAmount() {
         return 0;

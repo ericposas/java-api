@@ -11,7 +11,7 @@ public class SQLConfig {
     static {
         properties = new Properties();
         try {
-            properties.load(new FileInputStream("/home/eric/testproject/app/src/main/resources/sql.properties"));
+            properties.load(new FileInputStream("/home/eric/java/testproject/app/src/main/resources/sql.properties"));
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Could not load sql.properties file");
